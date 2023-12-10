@@ -11,13 +11,12 @@ def main():
 
     simulation = TrafficSimulation(screen, width, height)
     
-    while True:
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                pg.quit()
-                quit()
+    clock = pg.time.Clock()  # Create a clock object for controlling the frame rate
 
+    while True:
         simulation.update()
+        pg.display.flip()
+        clock.tick(60)  # 60 FPS
 
 if __name__ == "__main__":
     main()
