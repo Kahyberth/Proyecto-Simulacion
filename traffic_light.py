@@ -17,7 +17,7 @@ class TrafficLight:
 
 
 
-    def change_color (self, is_green):
+    def change_color (self, is_green, together = False):
       self.screen.blit(self.base, (self.x, self.y))
         
       if is_green:
@@ -26,6 +26,11 @@ class TrafficLight:
 
           self.screen.blit(self.red_light_off, (self.x + 17, self.y + 6))
           self.screen.blit(self.green_light, (self.x + 17, self.y + 24))
+      elif together:  #Si dado el caso se quiere que los dos semaforos esten en rojo
+          self.red = False
+          self.green = False
+          self.screen.blit(self.red_light_off, (self.x + 17, self.y + 6))
+          self.screen.blit(self.green_light_off, (self.x + 17, self.y + 24))
       else:
           self.red = False
           self.green = True

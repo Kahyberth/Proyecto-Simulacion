@@ -15,7 +15,7 @@ class TrafficSimulation:
         #self.car_speed = 5
         self.car_position_lane1 = 0
         self.car_position_lane2 = -width // 2
-        self.semaphore_interval = 20000 
+        self.semaphore_interval = 5000
         self.last_semaphore_change = pygame.time.get_ticks() # Tiempo en milisegundos
         self.is_green_left = False
         self.is_green_right = True
@@ -33,7 +33,6 @@ class TrafficSimulation:
         self.main_clock = pygame.time.Clock()
         self.game_clock = pygame.time.Clock()
         self.delta_time = 0.0
-        self.semaphore_interval = 20000
         self.remaining_semaphore_time = self.semaphore_interval
         
 
@@ -136,21 +135,24 @@ class TrafficSimulation:
                 self.is_green_left = not self.is_green_left
                 self.is_green_right = not self.is_green_right
 
+   
     def generate_cars(self):
-
         min_distance = 50
-        if not self.is_green_left and random.random() < self.car_generation_chance:
+
+       
+        if not self.is_green_left and len(self.lane1_cars) < 3 and random.random() < self.car_generation_chance:
             if not self.lane1_cars or self.lane1_cars[-1].position < self.width - min_distance:
                 car_lane1 = Car()
                 car_lane1.position = self.width
-                #print(car_lane1.position)
                 self.lane1_cars.append(car_lane1)
 
-        if not self.is_green_right and random.random() < self.car_generation_chance:
+ 
+        if not self.is_green_right and len(self.lane2_cars) < 5 and random.random() < self.car_generation_chance:
             if not self.lane2_cars or self.lane2_cars[-1].position > min_distance:
                 car_lane2 = Car()
                 car_lane2.position = 0
                 self.lane2_cars.append(car_lane2)
+    
 
 
 
