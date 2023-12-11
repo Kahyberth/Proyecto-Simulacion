@@ -5,9 +5,6 @@ from button import Button
 from car import Car
 from traffic_light import TrafficLight
 
-from collections import deque
-
-
 
 class TrafficSimulation:
     def __init__(self, screen, width, height):
@@ -16,12 +13,12 @@ class TrafficSimulation:
         self.height = height
         self.car_position_lane1 = 0
         self.car_position_lane2 = -width // 2
-        self.semaphore_interval = 2000#20000 
+        self.semaphore_interval = 8000#2000
         self.last_semaphore_change = pygame.time.get_ticks() # Tiempo en milisegundos
-        self.is_green_left = False
-        self.is_green_right = True
-        self.lane1_cars = deque()
-        self.lane2_cars = deque()
+        self.is_green_left = True
+        self.is_green_right = False
+        self.lane1_cars = []
+        self.lane2_cars = []
         self.car_generation_chance = 0.2
         self.traffic_light_left = TrafficLight(self.screen, 200, 130 )
         self.traffic_light_right = TrafficLight(self.screen, 600, 130)
@@ -35,6 +32,7 @@ class TrafficSimulation:
         self.game_clock = pygame.time.Clock()
         self.delta_time = 0.0
         self.remaining_semaphore_time = self.semaphore_interval
+        self.fase = 1
         
 
     def update(self):
@@ -90,8 +88,8 @@ class TrafficSimulation:
         quit()
 
     def restart_game(self):
-        self.lane1_cars = deque()
-        self.lane2_cars = deque()
+        self.lane1_cars = []
+        self.lane2_cars = []
         print("Game restarted")
 
 
@@ -130,20 +128,48 @@ class TrafficSimulation:
 
 
     def update_traffic_lights(self):
+        current_time = pygame.time.get_ticks()
+
+        if current_time - self.last_semaphore_change >= self.semaphore_interval:
+            self.last_semaphore_change = current_time
+
+            if self.is_green_left and not self.is_green_right:
+                # Izquierda verde, derecha rojo (8 segundos)
+                #pasa a rojo/rojo
+                self.is_green_left = False
+                self.is_green_right = False
+                self.semaphore_interval = 3000
+                self.fase = 2
+            elif not self.is_green_left and  not self.is_green_right:
+                # Ambos rojos (3 segundos)
+                if self.fase == 2:
+                    #pasa a rojo/verde
+                    self.is_green_left = False
+                    self.is_green_right = True
+                    self.semaphore_interval = 5000
+                    self.fase = 3
+                elif self.fase == 0:
+                    #pasa a verde/rojo
+                    self.is_green_left = True
+                    self.is_green_right = False
+                    self.semaphore_interval = 8000
+                    self.fase = 1
+            elif not self.is_green_left and self.is_green_right:
+                # Izquierda rojo, derecha verde (5 segundos)
+                #pasa a rojo/rojo
+                self.is_green_left = False
+                self.is_green_right = False
+                self.semaphore_interval = 3000
+                self.fase = 0
+
+            # Reiniciar el tiempo restante
+            self.remaining_semaphore_time = self.semaphore_interval
+
         if not self.is_paused:
-            self.remaining_semaphore_time -= self.delta_time * 1000  # Convert seconds to milliseconds
+            self.remaining_semaphore_time -= self.delta_time * 1000  # Convertir segundos a milisegundos
 
             if self.remaining_semaphore_time <= 0:
                 self.remaining_semaphore_time = self.semaphore_interval
-                self.is_green_left = not self.is_green_left
-                self.is_green_right = not self.is_green_right
-
-                # Cambiar el valor stop en función de la luz del semáforo
-                for car in self.lane1_cars:
-                    car.stop = not self.is_green_left
-
-                for car in self.lane2_cars:
-                    car.stop = not self.is_green_right
                     
     def generate_cars(self):
        
@@ -154,7 +180,6 @@ class TrafficSimulation:
             if not self.lane1_cars or self.lane1_cars[-1].position < self.width - min_distance:
                 car_lane1 = Car(1)
                 car_lane1.position = self.width
-                #print(car_lane1.position)
                 self.lane1_cars.append(car_lane1)
 
         if random.random() < self.car_generation_chance:
@@ -169,9 +194,7 @@ class TrafficSimulation:
     def draw_cars(self):
         for car in self.lane1_cars:
             car.draw_car(self.screen, car.position, self.height // 3 + 10, 0)
-            #print(car.position)
             
 
         for car in self.lane2_cars:
             car.draw_car(self.screen, car.position, self.height // 3 + 50, 180)
-            #print(car.position)

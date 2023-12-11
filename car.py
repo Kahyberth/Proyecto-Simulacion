@@ -17,25 +17,9 @@ class Car:
         self.visible = True
         self.stop = False
         self.car = pg.transform.scale(self.image, (self.width // 2, self.height // 2))
-        # ###########
-        # self.stop_position = 0
-        # self.distance_to_stop = 30
-        # self.lane = lane
-        # ###########
 
     def draw_car(self, screen, x, y, angle):
         if self.visible:
-
-            # if not self.stop and angle == 180:
-                
-            #     if self.position > self.stop_position:
-            #         self.position -= self.speed
-
-            # if self.stop and self.lane == 2:  
-            #     print("Carro en lane2 se detiene")
-            #     if self.position < self.stop_position:
-            #         self.position += self.speed
-            #         print("Carro en lane2 se mueve")
             car = pg.transform.rotate(self.car, angle)
             screen.blit(car, (x, y))
 
