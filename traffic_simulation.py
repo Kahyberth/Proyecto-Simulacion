@@ -20,11 +20,11 @@ class TrafficSimulation:
         self.lane1_cars = []
         self.lane2_cars = []
         self.car_generation_chance = 0.2
-        self.traffic_light_left = TrafficLight(self.screen, 200, 130 )
-        self.traffic_light_right = TrafficLight(self.screen, 600, 130)
+        self.traffic_light_left = TrafficLight(self.screen, 300, 130 )
+        self.traffic_light_right = TrafficLight(self.screen, 700, 130)
         self.font = pygame.font.Font(None, 36)
-        self.restart_button = Button(screen, 150, height - 80, 120, 50, (0, 0, 255), "Restart", self.restart_game)
-        self.pause_resume_button = Button(screen, 290, height - 80, 180, 50, (255, 165, 0), "Pause/Resume", self.toggle_pause)
+        self.restart_button = Button(screen, 100, height - 120, 120, 50, (0, 0, 255), "Restart", self.restart_game)
+        self.pause_resume_button = Button(screen, 250, height - 120, 180, 50, (255, 165, 0), "Pause/Resume", self.toggle_pause)
         self.is_paused = False
         self.last_pause_toggle_time = pygame.time.get_ticks()
         self.clock = pygame.time.Clock()
@@ -175,13 +175,11 @@ class TrafficSimulation:
             
             min_distance = 50
 
-        
             if not self.is_green_left and len(self.lane1_cars) < 3 and random.random() < self.car_generation_chance:
                 if not self.lane1_cars or self.lane1_cars[-1].position < self.width - min_distance:
                     car_lane1 = Car(1)
                     car_lane1.position = self.width
                     self.lane1_cars.append(car_lane1)
-
     
             if not self.is_green_right and len(self.lane2_cars) < 5 and random.random() < self.car_generation_chance:
                 if not self.lane2_cars or self.lane2_cars[-1].position > min_distance:
@@ -191,11 +189,9 @@ class TrafficSimulation:
 
 
 
-
     def draw_cars(self):
         for car in self.lane1_cars:
             car.draw_car(self.screen, car.position, self.height // 3 + 10, 0)
-            
 
         for car in self.lane2_cars:
             car.draw_car(self.screen, car.position, self.height // 3 + 50, 180)
