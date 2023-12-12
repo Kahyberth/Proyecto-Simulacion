@@ -6,19 +6,17 @@ from car import Car
 from traffic_light import TrafficLight
 
 
-
 class TrafficSimulation:
     def __init__(self, screen, width, height):
         self.screen = screen
         self.width = width
         self.height = height
-        #self.car_speed = 5
         self.car_position_lane1 = 0
         self.car_position_lane2 = -width // 2
-        self.semaphore_interval = 5000
+        self.semaphore_interval = 8000
         self.last_semaphore_change = pygame.time.get_ticks() # Tiempo en milisegundos
-        self.is_green_left = False
-        self.is_green_right = True
+        self.is_green_left = True
+        self.is_green_right = False
         self.lane1_cars = []
         self.lane2_cars = []
         self.car_generation_chance = 0.2
@@ -34,6 +32,7 @@ class TrafficSimulation:
         self.game_clock = pygame.time.Clock()
         self.delta_time = 0.0
         self.remaining_semaphore_time = self.semaphore_interval
+        self.fase = 1
         
 
     def update(self):
@@ -43,7 +42,6 @@ class TrafficSimulation:
             self.move_cars()
             self.update_traffic_lights()
             self.generate_cars()
-            self.remove_invisible_cars()
         self.screen.fill((255, 255, 255))
         self.draw_bridge(self.height // 2 - 100)
         self.traffic_light_left.change_color(self.is_green_left)
@@ -109,63 +107,95 @@ class TrafficSimulation:
 
     def move_cars(self):
         for car in self.lane1_cars:
-            car.position -= car.speed
-            if car.position + car.width < 0:
-                car.hide()
-                print("se esconde")
+            if self.is_green_right:
+                car.position -= car.speed
+
+            if not self.is_green_right and car.position < self.traffic_light_right.x :
+                car.position -= car.speed
+                
 
         for car in self.lane2_cars:
-            car.position += car.speed
-            #print("2--",car.position)
-            if car.position > self.width:
-                car.hide()
-                print("se esconde")
+            if self.is_green_left:
+                car.position += car.speed
+            
+            if not self.is_green_left and car.position > self.traffic_light_left.x:
+                car.position += car.speed
 
 
         # Actualizar las listas de acuerdo con las nuevas posiciones
         self.lane1_cars = [car for car in self.lane1_cars if car.position > 0]
-        self.lane2_cars = [car for car in self.lane2_cars if car.position < self.width]
+        self.lane2_cars = [car for car in self.lane2_cars if car.position < self.width]  # Mover el carro detenido al final de la cola
+
 
     def update_traffic_lights(self):
+        current_time = pygame.time.get_ticks()
+
+        if current_time - self.last_semaphore_change >= self.semaphore_interval:
+            self.last_semaphore_change = current_time
+
+            if self.is_green_left and not self.is_green_right:
+                # Izquierda verde, derecha rojo (8 segundos)
+                #pasa a rojo/rojo
+                self.is_green_left = False
+                self.is_green_right = False
+                self.semaphore_interval = 3000
+                self.fase = 2
+            elif not self.is_green_left and  not self.is_green_right:
+                # Ambos rojos (3 segundos)
+                if self.fase == 2:
+                    #pasa a rojo/verde
+                    self.is_green_left = False
+                    self.is_green_right = True
+                    self.semaphore_interval = 5000
+                    self.fase = 3
+                elif self.fase == 0:
+                    #pasa a verde/rojo
+                    self.is_green_left = True
+                    self.is_green_right = False
+                    self.semaphore_interval = 8000
+                    self.fase = 1
+            elif not self.is_green_left and self.is_green_right:
+                # Izquierda rojo, derecha verde (5 segundos)
+                #pasa a rojo/rojo
+                self.is_green_left = False
+                self.is_green_right = False
+                self.semaphore_interval = 3000
+                self.fase = 0
+
+            # Reiniciar el tiempo restante
+            self.remaining_semaphore_time = self.semaphore_interval
+
         if not self.is_paused:
-            self.remaining_semaphore_time -= self.delta_time * 1000  # Convert seconds to milliseconds
+            self.remaining_semaphore_time -= self.delta_time * 1000  # Convertir segundos a milisegundos
 
             if self.remaining_semaphore_time <= 0:
                 self.remaining_semaphore_time = self.semaphore_interval
-                self.is_green_left = not self.is_green_left
-                self.is_green_right = not self.is_green_right
-
-   
+                    
     def generate_cars(self):
-        min_distance = 50
+            
+            min_distance = 50
 
-       
-        if not self.is_green_left and len(self.lane1_cars) < 3 and random.random() < self.car_generation_chance:
-            if not self.lane1_cars or self.lane1_cars[-1].position < self.width - min_distance:
-                car_lane1 = Car()
-                car_lane1.position = self.width
-                self.lane1_cars.append(car_lane1)
+        
+            if not self.is_green_left and len(self.lane1_cars) < 3 and random.random() < self.car_generation_chance:
+                if not self.lane1_cars or self.lane1_cars[-1].position < self.width - min_distance:
+                    car_lane1 = Car(1)
+                    car_lane1.position = self.width
+                    self.lane1_cars.append(car_lane1)
 
- 
-        if not self.is_green_right and len(self.lane2_cars) < 5 and random.random() < self.car_generation_chance:
-            if not self.lane2_cars or self.lane2_cars[-1].position > min_distance:
-                car_lane2 = Car()
-                car_lane2.position = 0
-                self.lane2_cars.append(car_lane2)
     
+            if not self.is_green_right and len(self.lane2_cars) < 5 and random.random() < self.car_generation_chance:
+                if not self.lane2_cars or self.lane2_cars[-1].position > min_distance:
+                    car_lane2 = Car(2)
+                    car_lane2.position = 0
+                    self.lane2_cars.append(car_lane2)
+
 
 
 
     def draw_cars(self):
         for car in self.lane1_cars:
             car.draw_car(self.screen, car.position, self.height // 3 + 10, 0)
-            #print(car.position)
             
 
         for car in self.lane2_cars:
             car.draw_car(self.screen, car.position, self.height // 3 + 50, 180)
-            #print(car.position)
-    
-    def remove_invisible_cars(self):
-        self.lane1_cars = [car for car in self.lane1_cars if car.is_visible()]
-        self.lane2_cars = [car for car in self.lane2_cars if car.is_visible()]
