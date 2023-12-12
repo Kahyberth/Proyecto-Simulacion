@@ -5,7 +5,7 @@ from traffic_simulation import TrafficSimulation
 def main():
     pg.init()
 
-    width, height = 800, 600
+    width, height = 1000, 600
     screen = pg.display.set_mode((width, height))
     pg.display.set_caption('Simulación de Tráfico')
 

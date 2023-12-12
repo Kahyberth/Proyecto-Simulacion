@@ -20,11 +20,11 @@ class TrafficSimulation:
         self.lane1_cars = []
         self.lane2_cars = []
         self.car_generation_chance = 0.2
-        self.traffic_light_left = TrafficLight(self.screen, 200, 130 )
-        self.traffic_light_right = TrafficLight(self.screen, 600, 130)
+        self.traffic_light_left = TrafficLight(self.screen, 300, 130 )
+        self.traffic_light_right = TrafficLight(self.screen, 700, 130)
         self.font = pygame.font.Font(None, 36)
-        self.restart_button = Button(screen, 150, height - 80, 120, 50, (0, 0, 255), "Restart", self.restart_game)
-        self.pause_resume_button = Button(screen, 290, height - 80, 180, 50, (255, 165, 0), "Pause/Resume", self.toggle_pause)
+        self.restart_button = Button(screen, 100, height - 120, 120, 50, (0, 0, 255), "Restart", self.restart_game)
+        self.pause_resume_button = Button(screen,250, height - 120, 180, 50, (255, 165, 0), "Pause/Resume", self.toggle_pause)
         self.is_paused = False
         self.last_pause_toggle_time = pygame.time.get_ticks()
         self.clock = pygame.time.Clock()
