@@ -7,13 +7,14 @@ from Constants.constants import CARS_IMAGES
 
 class Car:
     
-    def __init__(self, lane):
+    def __init__(self, lane, speed):
         self.car_name = random.choice(list(CARS_IMAGES.keys()))
         self.image = pg.image.load(CARS_IMAGES[self.car_name])
         self.width = self.image.get_width()
         self.height = self.image.get_height()
         self.position = 0
-        self.speed = 5
+        self.speed = speed
+        self.acceleration = 0.1
         self.visible = True
         self.stop = False
         self.car = pg.transform.scale(self.image, (self.width // 2, self.height // 2))

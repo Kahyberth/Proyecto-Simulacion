@@ -138,6 +138,7 @@ class TrafficSimulation:
                 car.position -= car.speed
             
             if self.is_green_right or car.position < self.traffic_light_right.x or car not in self.lane1_cars[-3:]:
+                car.speed += car.acceleration
                 car.position -= car.speed
 
         # Mover los autos en la calle de la izquierda
@@ -150,6 +151,7 @@ class TrafficSimulation:
                 car.position += car.speed
 
             if self.is_green_left or car.position > self.traffic_light_left.x or car not in self.lane2_cars[-3:]:
+                car.speed += car.acceleration
                 car.position += car.speed
 
         # Mover los autos en la calle de arriba
@@ -162,6 +164,7 @@ class TrafficSimulation:
                 car.position += car.speed
 
             if self.is_green_bottom or car.position > self.traffic_light_bottom.y or car not in self.lane3_cars[-3:]:
+                car.speed += car.acceleration
                 car.position += car.speed
 
         # Mover los autos en la calle de abajo
@@ -174,6 +177,7 @@ class TrafficSimulation:
                 car.position -= car.speed
 
             if self.is_green_top or car.position < self.traffic_light_top.y or car not in self.lane4_cars[-3:]:
+                car.speed += car.acceleration
                 car.position -= car.speed
 
         # Actualizar las listas de acuerdo con las nuevas posiciones
@@ -238,29 +242,31 @@ class TrafficSimulation:
 
             min_distance = 50
 
+            #Generar autos en la calle de la izquierda
             if not self.is_green_left and len(self.lane1_cars) < 3 and random.random() < self.car_generation_chance:
                 if not self.lane1_cars or self.lane1_cars[-1].position < self.width - min_distance:
-                    car_lane1 = Car(1)
+                    car_lane1 = Car(1, 0.5)
                     car_lane1.position = self.width
                     self.lane1_cars.append(car_lane1)
 
-            if not self.is_green_right and len(self.lane2_cars) < 5 and random.random() < self.car_generation_chance:
+            #Generar autos en la calle de la derecha
+            if not self.is_green_right and len(self.lane2_cars) < 3 and random.random() < self.car_generation_chance:
                 if not self.lane2_cars or self.lane2_cars[-1].position > min_distance:
-                    car_lane2 = Car(2)
+                    car_lane2 = Car(2, 0.5)
                     car_lane2.position = 0
                     self.lane2_cars.append(car_lane2)
 
             #Generar autos en la calle de arriba
             if not self.is_green_top and len(self.lane3_cars) < 3 and random.random() < self.car_generation_chance:
                 if not self.lane3_cars or self.lane3_cars[-1].position > min_distance:
-                    car_lane3 = Car(3)
+                    car_lane3 = Car(3, 0.5)
                     car_lane3.position = 0
                     self.lane3_cars.append(car_lane3)
 
             #Generar autos en la calle de abajo
             if not self.is_green_bottom and len(self.lane4_cars) < 3 and random.random() < self.car_generation_chance:
                 if not self.lane4_cars or self.lane4_cars[-1].position < self.width - min_distance:
-                    car_lane4 = Car(4)
+                    car_lane4 = Car(4, 0.5)
                     car_lane4.position = self.width
                     self.lane4_cars.append(car_lane4)
 
