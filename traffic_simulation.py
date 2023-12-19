@@ -24,7 +24,7 @@ class TrafficSimulation:
         self.lane3_cars = []
         self.lane4_cars = []
         self.car_generation_chance = 0.2
-        self.traffic_light_left = TrafficLight(self.screen, 300, 130 )
+        self.traffic_light_left = TrafficLight(self.screen, 300, 130)
         self.traffic_light_right = TrafficLight(self.screen, 700, 325)
         self.traffic_light_top = TrafficLight(self.screen, 300, 325)
         self.traffic_light_bottom = TrafficLight(self.screen, 700, 130)
@@ -128,14 +128,20 @@ class TrafficSimulation:
             pygame.draw.rect(self.screen, (128, 128, 128), (0, y, self.width, 100))
 
     def move_cars(self):
+        # Mover los autos en la calle de la derecha
+
         for car in self.lane1_cars:
             if self.is_green_right or car not in self.lane1_cars[-3:]:
                 car.position -= car.speed
 
-            if not self.is_green_right and car.position < self.traffic_light_right.x and car not in self.lane1_cars[
-                                                                                                    -3:]:
+            if not self.is_green_right and car.position < self.traffic_light_right.x and car not in self.lane1_cars[-3:]:
+                car.position -= car.speed
+            
+            if self.is_green_right or car.position < self.traffic_light_right.x or car not in self.lane1_cars[-3:]:
                 car.position -= car.speed
 
+        # Mover los autos en la calle de la izquierda
+                
         for car in self.lane2_cars:
             if self.is_green_left or car not in self.lane2_cars[-3:]:
                 car.position += car.speed
@@ -143,21 +149,31 @@ class TrafficSimulation:
             if not self.is_green_left and car.position > self.traffic_light_left.x and car not in self.lane2_cars[-3:]:
                 car.position += car.speed
 
+            if self.is_green_left or car.position > self.traffic_light_left.x or car not in self.lane2_cars[-3:]:
+                car.position += car.speed
+
         # Mover los autos en la calle de arriba
+                
         for car in self.lane3_cars:
             if self.is_green_bottom or car not in self.lane3_cars[-3:]:
                 car.position += car.speed
 
-            if not self.is_green_bottom and car.position < self.traffic_light_bottom.y and car not in self.lane3_cars[
-                                                                                                      -3:]:
+            if not self.is_green_bottom and car.position < self.traffic_light_bottom.y and car not in self.lane3_cars[-3:]:
+                car.position += car.speed
+
+            if self.is_green_bottom or car.position > self.traffic_light_bottom.y or car not in self.lane3_cars[-3:]:
                 car.position += car.speed
 
         # Mover los autos en la calle de abajo
+                
         for car in self.lane4_cars:
             if self.is_green_top or car not in self.lane4_cars[-3:]:
                 car.position -= car.speed
 
             if not self.is_green_top and car.position > self.traffic_light_top.y and car not in self.lane4_cars[-3:]:
+                car.position -= car.speed
+
+            if self.is_green_top or car.position < self.traffic_light_top.y or car not in self.lane4_cars[-3:]:
                 car.position -= car.speed
 
         # Actualizar las listas de acuerdo con las nuevas posiciones

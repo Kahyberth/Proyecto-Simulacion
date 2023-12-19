@@ -2,7 +2,7 @@ from Constants.constants import LIGHTS_IMAGES
 import pygame as pg
 
 class TrafficLight:
-    def __init__(self, screen, x, y ):
+    def __init__(self, screen, x, y):
         self.red = True
         self.green = False
         self.screen = screen
